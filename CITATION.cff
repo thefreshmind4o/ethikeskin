@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "Wenn Sie Ethikeskin nutzen, zitieren Sie bitte wie folgt."
+type: software
+title: "Ethikeskin (@hikeskin): Charta, Spezifikation und Referenz-Implementierung des Vokabulars ethikeskin-core mit dem Core-Keyword x-psy-achse"
+abstract: >-
+  Ethikeskin (@hikeskin) ist ein JSON-Schema-Dialekt zur humanen
+  Technologiepruefung. Das Core-Keyword x-psy-achse operationalisiert fuenf
+  psychische Wirkachsen (Stresslast, Komplexitaetslast, Ueberwachungsdruck,
+  Erholungsfaehigkeit, Selbstwirksamkeitsstuetzung). Version 0.4 fuehrt eine
+  Zwei-Schichten-Auswertung ein: Schicht A (Veto, ungewichtet) vor Schicht B
+  (Grad, gewichtete und normierte Valenz). Grenzwerte und Gewichte sind
+  Kalibrierungsvorschlaege (Evidenzniveau KONZEPTUELL).
+version: "0.4.0"
+date-released: "2026-07-15"
+authors:
+  - family-names: "Heiler"
+    given-names: "Maximilian"
+    orcid: "https://orcid.org/0009-0003-2785-1710"
+    affiliation: "Logik-Institut"
+license: "Apache-2.0"
+license-url: "https://www.apache.org/licenses/LICENSE-2.0"
+repository-code: "https://github.com/thefreshmind4o/ethikeskin"
+url: "https://github.com/thefreshmind4o/ethikeskin"
+keywords:
+  - Ethikeskin
+  - hikeskin
+  - EthicalSchema
+  - JSON Schema
+  - ethikeskin-core
+  - x-psy-achse
+  - humane Technologie
+  - psychische Belastung
+  - Ueberwachung
+  - Vulnerabilitaet
+  - Ajv
+  - Logik-Institut
+# ---------------------------------------------------------------------------
+# DOI-SYNCHRONISATION (nach dem Zenodo-Upload ausfuellen):
+#   Zenodo vergibt zwei DOIs:
+#     • Concept-DOI  — stabil, zeigt immer auf die neueste Version.  -> identifiers unten
+#     • Version-DOI  — fest auf genau diese Version (0.4.0).         -> Feld  doi:
+#   Beide eintragen, damit Git-Tag (v0.4.0), npm-Paket (0.4.0) und Zenodo
+#   dieselbe Version referenzieren.
+# doi: "10.5281/zenodo.XXXXXXX"          # Version-DOI fuer 0.4.0
+# identifiers:
+#   - type: doi
+#     value: "10.5281/zenodo.YYYYYYY"     # Concept-DOI (versionsuebergreifend)
+#     description: "Concept-DOI (alle Versionen)"
+# ---------------------------------------------------------------------------
+# Lizenztrennung: Der Quellcode (Ajv-Plugin) steht unter Apache-2.0 — dieses
+# CITATION.cff bezieht sich auf die Software. Die begleitenden Texte (Charta,
+# Spezifikationen) stehen unter CC BY 4.0 — siehe LIZENZ.md.
