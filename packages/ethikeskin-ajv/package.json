@@ -18,14 +18,14 @@
   ],
   "author": "Heiler, Maximilian (ORCID 0009-0003-2785-1710)",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/DEIN-GITHUB-USER/ethikeskin#readme",
+  "homepage": "https://github.com/thefreshmind4o/ethikeskin#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DEIN-GITHUB-USER/ethikeskin.git",
+    "url": "git+https://github.com/thefreshmind4o/ethikeskin.git",
     "directory": "packages/ethikeskin-ajv"
   },
   "bugs": {
-    "url": "https://github.com/DEIN-GITHUB-USER/ethikeskin/issues"
+    "url": "https://github.com/thefreshmind4o/ethikeskin/issues"
   },
   "files": [
     "ethikeskin-keyword.js",

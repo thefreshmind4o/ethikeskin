@@ -4,7 +4,7 @@
 
 Autor: **Maximilian Heiler** · ORCID [0009-0003-2785-1710](https://orcid.org/0009-0003-2785-1710) · Logik-Institut
 
-[![CI](https://github.com/DEIN-GITHUB-USER/ethikeskin/actions/workflows/ci.yml/badge.svg)](https://github.com/DEIN-GITHUB-USER/ethikeskin/actions/workflows/ci.yml)
+[![CI](https://github.com/thefreshmind4o/ethikeskin/actions/workflows/ci.yml/badge.svg)](https://github.com/thefreshmind4o/ethikeskin/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@logikinstitut/ethikeskin-ajv.svg)](https://www.npmjs.com/package/@logikinstitut/ethikeskin-ajv)
 
 ---

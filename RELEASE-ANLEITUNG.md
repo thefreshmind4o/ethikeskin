@@ -5,7 +5,7 @@ automatischer npm-Veröffentlichung ohne Token". Du hast deinen npm-Account bere
 mit GitHub verknüpft und die npm-Organisation **`logikinstitut`** angelegt — genau
 darauf ist alles abgestimmt.
 
-> **Ein Platzhalter zu ersetzen:** Überall steht `DEIN-GITHUB-USER`. Ersetze ihn
+> **Ein Platzhalter zu ersetzen:** Überall steht `thefreshmind4o`. Ersetze ihn
 > durch deinen **exakten GitHub-Benutzernamen** (Groß-/Kleinschreibung egal, aber
 > genau der Kontoname). Suchen & Ersetzen in: `README.md`, `packages/ethikeskin-ajv/package.json`.
 
@@ -39,7 +39,7 @@ Nachweis** — neben der Zenodo-DOI ein zweiter, unabhängiger Prioritätsbeleg.
    (Owner = dein Konto). Kein README/License/gitignore anhaken (ist schon da).
 2. Lokales Repo verbinden und pushen:
    ```bash
-   git remote add origin https://github.com/DEIN-GITHUB-USER/ethikeskin.git
+   git remote add origin https://github.com/thefreshmind4o/ethikeskin.git
    git branch -M main
    git push -u origin main
    git push origin v0.3.0        # Tag NOCH NICHT pushen, wenn npm-Publisher
@@ -69,7 +69,7 @@ Token publizieren. So autorisierst du genau diesen Workflow:
    ```
 3. **Trusted Publisher hinterlegen:** npmjs.com → Paket `@logikinstitut/ethikeskin-ajv`
    → **Settings → Trusted Publisher → GitHub Actions**. Eintragen:
-   - **Organization or user:** `DEIN-GITHUB-USER`
+   - **Organization or user:** `thefreshmind4o`
    - **Repository:** `ethikeskin`
    - **Workflow filename:** `publish.yml`   (nur der Dateiname)
    - **Environment name:** leer lassen
