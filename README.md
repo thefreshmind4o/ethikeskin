@@ -7,6 +7,16 @@ Autor: **Maximilian Heiler** · ORCID [0009-0003-2785-1710](https://orcid.org/00
 [![CI](https://github.com/thefreshmind4o/ethikeskin/actions/workflows/ci.yml/badge.svg)](https://github.com/thefreshmind4o/ethikeskin/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@logikinstitut/ethikeskin-ajv.svg)](https://www.npmjs.com/package/@logikinstitut/ethikeskin-ajv)
 
+![Illustration der Schutzschichten von Ethikeskin: konzentrische Schichten (Relief, Counterbalance, Autonomy, Transparency, Cohesion, Vulnerability) um einen technischen Kern. Links abgewehrte Risiken (Ueberwachung, Ueberlastung, Manipulation, Ausgrenzung, Abhaengigkeit, Intransparenz), rechts was durchgelassen wird (Wohlbefinden, Balance, Selbstwirksamkeit, Vertrauen, Gemeinschaft, Sicherheit).](./assets/ethikeskin-schutzschichten.jpeg)
+
+> Die Schutzschichten von Ethikeskin: Links werden Belastungen abgewehrt (u. a.
+> Ueberwachungsdruck), rechts passieren nur menschendienliche Wirkungen. Die
+> Schichtnamen entsprechen den `x-schutzkern`-Konstanten (Relief →
+> ENTLASTUNG_ZUERST, Autonomy → AUTONOMIE_WAHREN, Transparency →
+> TRANSPARENZ_PFLICHT, Cohesion → KOHAESION_SCHUETZEN, Vulnerability →
+> VULNERABILITAET_ZUERST, Counterbalance → x-gegenlast). Abbildung: Logik-Institut,
+> CC BY 4.0.
+
 ---
 
 ## Idee
@@ -30,12 +40,14 @@ verschärfend**.
 │   └─ ethikeskin_v0.3_charta.md                        (lesbare Charta)
 ├─ packages/ethikeskin-ajv/   ── Code · Lizenz Apache-2.0 ──
 │   ├─ ethikeskin-keyword.js    natives Ajv-Plugin (Core-Keyword x-psy-achse)
-│   ├─ test-ajv.js              7 Referenzfälle (A–G)
+│   ├─ test-ajv.js              v0.4-Suite: Parität A–G + gewichtete Valenz + Invarianten
 │   └─ LICENSE · NOTICE · package.json · README.md
+├─ assets/                     ── Abbildungen · CC BY 4.0 ──
+│   └─ ethikeskin-schutzschichten.jpeg
 ├─ .github/workflows/
 │   ├─ ci.yml                   Tests bei jedem Push/PR (Node 18/20/22)
 │   └─ publish.yml              npm-Release via Trusted Publishing (OIDC)
-├─ LIZENZ.md · LICENSE-CC-BY-4.0.txt
+├─ CITATION.cff · LIZENZ.md · LICENSE-CC-BY-4.0.txt
 ```
 
 ## Schnellstart
@@ -44,7 +56,7 @@ verschärfend**.
 cd packages/ethikeskin-ajv
 npm install ajv@^8 --no-save
 npm test
-# ✅ Alle 7 Fälle: Ajv-Plugin identisch zum Referenz-Validator.
+# ✅ 13 bestanden, 0 fehlgeschlagen (Parität A–G · gewichtete Valenz · Invarianten)
 ```
 
 Als npm-Paket:
@@ -71,10 +83,12 @@ Siehe [`LIZENZ.md`](./LIZENZ.md) für Begründung und Grenzfälle.
 
 ## Zitation
 
-> Heiler, M. (2026). *Ethikeskin (@hikeskin)* (Version 0.3.0). Logik-Institut.
+> Heiler, M. (2026). *Ethikeskin (@hikeskin)* (Version 0.4.0). Logik-Institut.
 > Zenodo. https://doi.org/<DOI-nach-Upload>
 
-Siehe auch das Zenodo-Deposit-Bündel für die DOI-Vergabe.
+Strukturierte Zitationsdaten in [`CITATION.cff`](./CITATION.cff) (GitHub zeigt
+daraus automatisch „Cite this repository"). Siehe auch das Zenodo-Deposit-Bündel
+für die DOI-Vergabe.
 
 ---
 
