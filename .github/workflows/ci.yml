@@ -1,6 +1,7 @@
 name: CI
 
-# Führt die 7 Referenzfälle (A–G) bei jedem Push und Pull Request aus.
+# Führt die v0.4-Testsuite (13 Prüfungen) bei jedem Push und Pull Request aus:
+#   Teil 1 Verdikt-Parität A–G · Teil 2 gewichtete Valenz (Schicht B) · Teil 3 Invarianten.
 # Schlägt der Testlauf fehl, blockiert das den Merge / die spätere Veröffentlichung
 # (maschinelle Entsprechung der "monotonen Verschärfung": nichts Gebrochenes geht raus).
 
@@ -26,5 +27,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Ajv (peer dependency) installieren
         run: npm install ajv@^8 --no-save
-      - name: Referenzfälle prüfen
+      - name: v0.4-Testsuite prüfen
         run: npm test

@@ -1,7 +1,7 @@
 {
   "name": "@logikinstitut/ethikeskin-ajv",
-  "version": "0.3.0",
-  "description": "@hikeskin / ethikeskin-core — natives Ajv-Plugin fuer das Core-Keyword x-psy-achse (humane Technologiepruefung, Logik-Institut).",
+  "version": "0.4.0",
+  "description": "@hikeskin / ethikeskin-core — natives Ajv-Plugin fuer das Core-Keyword x-psy-achse: Veto (Schicht A) + gewichtete, normierte Valenz (Schicht B). Humane Technologiepruefung, Logik-Institut.",
   "main": "ethikeskin-keyword.js",
   "type": "commonjs",
   "scripts": {

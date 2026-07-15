@@ -6,6 +6,24 @@ prüfen Standard-JSON-Schema-Validatoren den @hikeskin-Dialekt nativ — inklusi
 des dynamischen Stress-Kipppunkts (Überwachung × Komplexität), der harten
 Fail-Kopplungen und der 🛡-Grenzwertbänder für vulnerable Gruppen.
 
+## Zwei-Schichten-Architektur (v0.4)
+
+Die Auswertung läuft in zwei klar getrennten Schichten — **Veto vor Grad**:
+
+1. **Schicht A — Veto (ungewichtet, absorbierend).** K-Regeln, Transparenz-Pflicht
+   und die schutzkern-Konstanten. Feuert eine Regel, ist die Instanz 🟥 FAIL —
+   **kein Gewicht kann das aufheben** (`valenz = null`).
+2. **Schicht B — Grad (gewichtet, normiert).** Nur wenn kein Veto vorliegt, wird
+   die Feinabstufung 🟩/🟨 aus einer gewichteten, normierten Valenz gebildet:
+   \( V_{gew} = \frac{\sum_a w_a \cdot v_a}{\sum_a w_a} \cdot n \) (n = 5 Achsen).
+
+Bei gleichen Gewichten (w = 1) ist \(V_{gew}\) skaleninvariant identisch zur rohen
+v0.3-Summe — die A–G-Verdikte bleiben also **unverändert**. Gewichtsprofile
+(`standard`, `vulnerabel`, `arbeit`) sind über `cfg.gewichte` konfigurierbar;
+mehrere aktive Profile werden pro Achse **maximal** kombiniert und durch einen
+**Deckel** \(0 < w \le 3\) begrenzt. Gewichte sind normativ/überschreibbar
+(Kalibrierungsvorschläge, Evidenzniveau KONZEPTUELL).
+
 ## Installation
 
 ```bash
@@ -71,13 +89,22 @@ console.log(kw.validate.verdikt);       // { state:"FAIL", marker:"🟥", log:[ 
 ## Test
 
 ```bash
+npm install ajv@^8 --no-save
 node test-ajv.js
-# ✅ Alle 7 Fälle: Ajv-Plugin identisch zum Referenz-Validator.
+# ✅ 13 bestanden, 0 fehlgeschlagen
 ```
 
-Die sieben Fälle (A–G) decken: dynamische Kopplung (A vs. B), sauberes PASS (C),
-harten Überwachungs-Fail (D), Ressourcen-Defizit (E), 🛡-Verschärfung (F) und
-Transparenz-Pflicht mit Monotonie-Garantie (G).
+Die Suite deckt drei Teile ab:
+
+- **Teil 1 — Verdikt-Parität A–G (7 Fälle):** dynamische Kopplung (A vs. B),
+  sauberes PASS (C), harten Überwachungs-Fail (D), Ressourcen-Defizit (E),
+  🛡-Verschärfung (F), Transparenz-Pflicht mit Monotonie-Garantie (G). Bei
+  gleichen Gewichten identisch zum v0.2/v0.3-Referenz-Validator.
+- **Teil 2 — gewichtete Valenz (Schicht B):** Fälle H/I unter Profilen, inkl.
+  Nachweis, dass das K-UEBER-Veto der gewichteten Saldierung vorausgeht.
+- **Teil 3 — Invarianten:** Regression (w = 1 ⇒ gewichtet == roh), Veto
+  gewichtsfrei (Fall A bleibt FAIL unter Extremgewichten 3/3/3/3/3),
+  Gewichts-Deckel (w > 3 wird abgewiesen).
 
 ---
 
