@@ -1,0 +1,46 @@
+{
+  "name": "@logikinstitut/ethikeskin-ajv",
+  "version": "0.3.0",
+  "description": "@hikeskin / ethikeskin-core — natives Ajv-Plugin fuer das Core-Keyword x-psy-achse (humane Technologiepruefung, Logik-Institut).",
+  "main": "ethikeskin-keyword.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test-ajv.js"
+  },
+  "keywords": [
+    "ethikeskin",
+    "hikeskin",
+    "ethical-schema",
+    "json-schema",
+    "ajv",
+    "ajv-keyword",
+    "logik-institut"
+  ],
+  "author": "Heiler, Maximilian (ORCID 0009-0003-2785-1710)",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/DEIN-GITHUB-USER/ethikeskin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DEIN-GITHUB-USER/ethikeskin.git",
+    "directory": "packages/ethikeskin-ajv"
+  },
+  "bugs": {
+    "url": "https://github.com/DEIN-GITHUB-USER/ethikeskin/issues"
+  },
+  "files": [
+    "ethikeskin-keyword.js",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "ajv": "^8"
+  }
+}

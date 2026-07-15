@@ -1,0 +1,61 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+========================================================================
+
+Diese Lizenz gilt für die TEXTE / INHALTE des Projekts @hikeskin /
+EthicalSchema — insbesondere:
+
+  - "Die Ethikeskin-Charta" (ethikeskin_v0.3_charta.md)
+  - "Ethikeskin v0.2 — x-psy-achse als Core-Keyword" (Spezifikation)
+  - "Ethikeskin v0.1 — Spezifikationsmatrix der psy-Achse"
+
+Sie gilt NICHT für den Quellcode des Ajv-Plugins (ethikeskin-ajv);
+dieser steht unter Apache License 2.0. Siehe LIZENZ.md.
+
+------------------------------------------------------------------------
+URHEBER / ATTRIBUTION
+------------------------------------------------------------------------
+Werk:     Ethikeskin (@hikeskin) — Charta und Spezifikation
+Urheber:  Maximilian Heiler
+ORCID:    0009-0003-2785-1710
+Institut: Logik-Institut
+Jahr:     2026
+Lizenz:   CC BY 4.0
+
+Empfohlener Zitationshinweis bei Nachnutzung:
+  "Heiler, M. (2026). Ethikeskin (@hikeskin) — Charta und Spezifikation.
+   Logik-Institut. Lizenziert unter CC BY 4.0."
+
+------------------------------------------------------------------------
+ZUSAMMENFASSUNG (nicht rechtsverbindlich)
+------------------------------------------------------------------------
+Sie dürfen:
+  - Teilen — das Material in jedwedem Format vervielfältigen und
+    weiterverbreiten.
+  - Bearbeiten — das Material remixen, verändern und darauf aufbauen,
+    für beliebige Zwecke, auch kommerziell.
+
+Unter folgender Bedingung:
+  - Namensnennung (BY) — Sie müssen angemessene Urheber- und
+    Rechteangaben machen, einen Link zur Lizenz beifügen und angeben,
+    ob Änderungen vorgenommen wurden. Diese Angaben dürfen in jeder
+    angemessenen Art und Weise gemacht werden, jedoch nicht so, dass
+    der Eindruck entsteht, der Lizenzgeber unterstütze gerade Sie oder
+    Ihre Nutzung besonders.
+
+Keine weiteren Einschränkungen — Sie dürfen keine zusätzlichen Klauseln
+oder technischen Verfahren einsetzen, die anderen rechtlich irgendetwas
+untersagen, was die Lizenz erlaubt.
+
+------------------------------------------------------------------------
+VERBINDLICHER LIZENZTEXT (Legal Code)
+------------------------------------------------------------------------
+Der vollständige, rechtsverbindliche Lizenztext ist abrufbar unter:
+
+  https://creativecommons.org/licenses/by/4.0/legalcode.de   (Deutsch)
+  https://creativecommons.org/licenses/by/4.0/legalcode      (Englisch)
+
+Die menschenlesbare Kurzfassung ("Deed"):
+
+  https://creativecommons.org/licenses/by/4.0/deed.de
+
+Die obige Zusammenfassung ersetzt den verbindlichen Lizenztext nicht.

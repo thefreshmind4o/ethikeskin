@@ -1,0 +1,39 @@
+name: Publish Package
+
+# Veröffentlicht @logikinstitut/ethikeskin-ajv auf npm — OHNE gespeicherten Token.
+# Authentifizierung erfolgt über npm Trusted Publishing (OIDC): npm vertraut genau
+# diesem Workflow in diesem Repository. Voraussetzung: Auf npmjs.com ist unter den
+# Paket-Einstellungen ein "Trusted Publisher" mit exakt diesen Werten eingetragen
+# (Organization/User = GitHub-Owner, Repository = ethikeskin, Workflow = publish.yml).
+#
+# Auslöser: ein Git-Tag der Form v* (z. B. v0.3.0). Also: Version taggen -> Release.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write   # ERFORDERLICH für OIDC / Trusted Publishing
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ethikeskin-ajv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Ajv (peer dependency) installieren
+        run: npm install ajv@^8 --no-save
+      - name: Tests vor Veröffentlichung
+        run: npm test
+      - name: Aktuelles npm (Trusted Publishing braucht npm >= 11.5.1)
+        run: npm install -g npm@latest
+      - name: Veröffentlichen (mit Provenance, ohne Token)
+        run: npm publish

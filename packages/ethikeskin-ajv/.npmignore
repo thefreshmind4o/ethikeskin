@@ -1,0 +1,11 @@
+# Nicht ins npm-Paket aufnehmen (Whitelist steht in package.json "files")
+node_modules/
+test-ajv.js
+package-lock.json
+*.log
+.DS_Store
+
+# Projekt-Texte gehören NICHT zum Apache-lizenzierten Code-Paket.
+# Sie liegen separat unter CC BY 4.0 (siehe LIZENZ.md im Gesamtbündel).
+LICENSE-CC-BY-4.0.txt
+LIZENZ.md

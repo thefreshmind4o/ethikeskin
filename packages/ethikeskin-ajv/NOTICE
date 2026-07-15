@@ -1,0 +1,17 @@
+ethikeskin-ajv
+Copyright 2026 Maximilian Heiler (Logik-Institut)
+ORCID: 0009-0003-2785-1710
+
+Dieses Produkt enthält Software, die vom Logik-Institut entwickelt wurde
+(https://logik-institut.org) im Rahmen des Projekts @hikeskin / EthicalSchema.
+
+Der Quellcode (das Ajv-Plugin für das Core-Keyword "x-psy-achse" des
+Vokabulars "ethikeskin-core") ist unter der Apache License, Version 2.0,
+lizenziert. Siehe die Datei LICENSE.
+
+Hinweis zur Trennung von Code und Inhalt:
+Die begleitenden Texte des Projekts — insbesondere "Die Ethikeskin-Charta"
+und die Spezifikationsdokumente (v0.1, v0.2) — sind KEIN Teil dieses
+Apache-lizenzierten Codes. Sie stehen unter der Lizenz
+Creative Commons Attribution 4.0 International (CC BY 4.0).
+Siehe LIZENZ.md für die Gesamtübersicht.

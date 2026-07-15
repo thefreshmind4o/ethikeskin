@@ -1,0 +1,30 @@
+name: CI
+
+# Führt die 7 Referenzfälle (A–G) bei jedem Push und Pull Request aus.
+# Schlägt der Testlauf fehl, blockiert das den Merge / die spätere Veröffentlichung
+# (maschinelle Entsprechung der "monotonen Verschärfung": nichts Gebrochenes geht raus).
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ '18', '20', '22' ]
+    defaults:
+      run:
+        working-directory: packages/ethikeskin-ajv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Ajv (peer dependency) installieren
+        run: npm install ajv@^8 --no-save
+      - name: Referenzfälle prüfen
+        run: npm test
