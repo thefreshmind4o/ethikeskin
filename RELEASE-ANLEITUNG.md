@@ -1,65 +1,61 @@
-# Einrichtung & Release — Git-Repo + npm (@logikinstitut/ethikeskin-ajv)
+# Einrichtung & Release — GitHub-Repo + npm (@logikinstitut/ethikeskin-ajv)
 
-Diese Anleitung führt dich von „lokaler Ordner" zu „öffentliches GitHub-Repo mit
-automatischer npm-Veröffentlichung ohne Token". Du hast deinen npm-Account bereits
-mit GitHub verknüpft und die npm-Organisation **`logikinstitut`** angelegt — genau
-darauf ist alles abgestimmt.
+Diese Anleitung dokumentiert den Ist-Zustand und führt dich durch die noch
+offenen, an dein npm-Login gebundenen Schritte.
 
-> **Ein Platzhalter zu ersetzen:** Überall steht `thefreshmind4o`. Ersetze ihn
-> durch deinen **exakten GitHub-Benutzernamen** (Groß-/Kleinschreibung egal, aber
-> genau der Kontoname). Suchen & Ersetzen in: `README.md`, `packages/ethikeskin-ajv/package.json`.
+- **GitHub-Konto:** `thefreshmind4o`
+- **Repository:** [github.com/thefreshmind4o/ethikeskin](https://github.com/thefreshmind4o/ethikeskin) — **öffentlich, online**
+- **npm-Organisation:** `logikinstitut` · **Paket:** `@logikinstitut/ethikeskin-ajv`
+
+> Der GitHub-Handle (`thefreshmind4o`) und die npm-Org (`logikinstitut`) tragen
+> unterschiedliche Namen. Für Trusted Publishing ist das unerheblich — es
+> verknüpft Repository ↔ Paket direkt. Wichtig ist nur, beim npm-Setup exakt
+> `thefreshmind4o/ethikeskin` als Quelle einzutragen (Teil 3).
 
 ---
 
-## Teil 1 — Git-Repository lokal (bereits vorbereitet)
+## Teil 1 — Git-Repository ✅ ERLEDIGT
 
-Das entpackte Bündel ist bereits ein initialisiertes Git-Repo mit einem ersten,
-datierten Commit und dem Tag `v0.3.0`. Prüfen:
+Das Repo ist initialisiert, die datierte Historie steht:
 
 ```bash
 cd ethikeskin-repo
-git log --oneline --decorate     # zeigt den Commit + Tag v0.3.0
+git log --oneline --decorate     # zeigt Commits + Tag v0.3.0
 git show --stat v0.3.0           # datierter Nachweis (Autor, Zeitstempel)
 ```
 
-Der Commit-Zeitstempel + der SHA-Hash sind dein **kryptografisch datierter
-Nachweis** — neben der Zenodo-DOI ein zweiter, unabhängiger Prioritätsbeleg.
+- Commit `ae9d253` (Tag `v0.3.0`) — Autor: Maximilian Heiler <trueserenity@posteo.de>, 2026-07-15
+- Folge-Commit `3e1336d` — GitHub-Username in den URLs eingesetzt
 
-> Falls du Git-Autor/E-Mail korrigieren willst (der Commit wurde neutral gesetzt):
-> ```bash
-> git config user.name  "Maximilian Heiler"
-> git config user.email "DEINE@mail"
-> git commit --amend --reset-author --no-edit
-> git tag -f v0.3.0
-> ```
+Der Commit-Zeitstempel + SHA-Hash sind dein **kryptografisch datierter Nachweis**
+— neben der Zenodo-DOI ein zweiter, unabhängiger Prioritätsbeleg.
 
-## Teil 2 — Auf GitHub veröffentlichen
+## Teil 2 — Auf GitHub veröffentlicht ✅ ERLEDIGT
 
-1. Auf GitHub ein **neues, leeres** Repository anlegen: Name **`ethikeskin`**
-   (Owner = dein Konto). Kein README/License/gitignore anhaken (ist schon da).
-2. Lokales Repo verbinden und pushen:
-   ```bash
-   git remote add origin https://github.com/thefreshmind4o/ethikeskin.git
-   git branch -M main
-   git push -u origin main
-   git push origin v0.3.0        # Tag NOCH NICHT pushen, wenn npm-Publisher
-                                 # noch nicht eingerichtet ist (siehe Teil 3)!
-   ```
-   Der Push von `main` startet sofort den **CI-Workflow** (Tests). Sieh unter
-   „Actions" nach, dass er grün ist.
+Das öffentliche Repo ist angelegt und gepusht (main + Tag `v0.3.0`):
 
-## Teil 3 — npm Trusted Publisher einrichten (einmalig, kein Token nötig)
+```bash
+# So wurde es angelegt (bereits geschehen):
+gh repo create ethikeskin --public --source=. --remote=origin --push
+git push origin v0.3.0
+```
 
-Weil dein npm-Account mit GitHub verknüpft ist, kannst du ganz ohne gespeicherten
-Token publizieren. So autorisierst du genau diesen Workflow:
+- Sichtbarkeit: **PUBLIC**, Default-Branch: `main`
+- Beide Workflows sind aktiv erkannt: **CI** und **Publish Package**
+- Der Push von `main` hat den **CI-Workflow** ausgelöst. Kontrolle unter
+  [Actions](https://github.com/thefreshmind4o/ethikeskin/actions) — der Lauf sollte grün sein.
+
+## Teil 3 — npm Trusted Publisher einrichten ⏳ OFFEN (dein Login)
+
+Weil dein npm-Account mit GitHub verknüpft ist, kannst du ohne gespeicherten
+Token publizieren. Diese Schritte sind login-gebunden und daher von dir
+auszuführen:
 
 1. Sicherstellen, dass die **Organisation `logikinstitut`** auf npmjs.com existiert
-   und dir gehört (Paketname-Scope = `@logikinstitut`).
-2. Da das Paket noch nicht existiert, den ersten Publish so vorbereiten:
-   Rufe **npmjs.com → dein Profil → „Add package" bzw. die Trusted-Publisher-
-   Einstellung** auf. Alternativ (robuster Weg): den allerersten Publish **einmal
-   manuell lokal** machen, damit das Paket existiert, danach Trusted Publishing für
-   alle weiteren Releases:
+   und dir gehört (Scope = `@logikinstitut`).
+2. Da das Paket noch nicht existiert, den **allerersten Publish einmal manuell
+   lokal** machen, damit das Paket angelegt ist; danach übernimmt Trusted
+   Publishing alle weiteren Releases:
    ```bash
    cd packages/ethikeskin-ajv
    npm login                      # dein npm-Konto
@@ -78,7 +74,7 @@ Token publizieren. So autorisierst du genau diesen Workflow:
 
 ## Teil 4 — Automatische Releases ab jetzt
 
-Ab jetzt genügt für jede neue Version:
+Sobald Teil 3 steht, genügt für jede neue Version:
 
 ```bash
 # 1) Version erhöhen (hält package.json + Tag synchron)
@@ -107,7 +103,12 @@ Der Tag `v*` löst `publish.yml` aus: GitHub Actions authentifiziert sich per
 Dieselbe Nummer in `package.json`, dem Git-Tag, `CITATION.cff` und der
 Zenodo-`version` halten.
 
+> **Hinweis zu v0.4:** Der aktuelle npm-/Repo-Stand ist v0.3.0. Das v0.4-Konzept
+> (gewichtete Valenz + Fünf-Schichten-Integration) ist verifiziert, aber noch
+> nicht als Release getaggt. Ein `npm version minor` → `v0.4.0` würde es
+> veröffentlichen, sobald der Plugin-Code auf v0.4 in `packages/` übernommen ist.
+
 ---
 
-*Dies ist keine Rechtsberatung. Grenzwerte sind Kalibrierungsvorschläge
-(Evidenzniveau KONZEPTUELL).*
+*Dies ist keine Rechtsberatung. Grenzwerte und Gewichte sind
+Kalibrierungsvorschläge (Evidenzniveau KONZEPTUELL).*
