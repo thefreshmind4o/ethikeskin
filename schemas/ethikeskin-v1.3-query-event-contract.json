@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thefreshmind4o/ethikeskin/schemas/ethikeskin-v1.3-query-event-contract.json",
+  "title": "EthikeSkin v1.3 Query Event Contract",
+  "type": "object",
+  "required": ["query_id", "ethikeskin_version", "zugeordnete_achsen", "richtung", "vetos_geprueft", "blockiert"],
+  "properties": {
+    "query_id": {"type": "string", "pattern": "^q-[0-9]{8}-[a-f0-9]{8}$"},
+    "ethikeskin_version": {"const": "v1.3"},
+    "zugeordnete_achsen": {"type": "array", "items": {"enum": ["PSY", "SOZ", "BIO", "SEX", "OEKO", "EPI", "KRIM", "TECH", "KRYPT", "IMMUN", "ASTRO"]}, "uniqueItems": true},
+    "richtung": {"type": "object", "required": ["ausgewiesen"], "properties": {"ausgewiesen": {"type": "boolean"}, "source_axis": {"type": ["string", "null"]}, "target_axis": {"type": ["string", "null"]}}},
+    "vetos_geprueft": {"type": "array", "items": {"type": "object", "required": ["regel", "ergebnis"], "properties": {"regel": {"type": "string"}, "ergebnis": {"enum": ["pass", "fail", "na"]}}}},
+    "blockiert": {"type": "object", "required": ["ist_blockiert"], "properties": {"ist_blockiert": {"type": "boolean"}, "eskalationsstufe": {"enum": ["warn", "block", "human_review", null]}}},
+    "vulnerabilitaets_pruefung": {"type": "object", "properties": {"asymmetrie_erkannt": {"type": "boolean"}, "vulnerable_position": {"type": ["string", "null"]}, "zuerst_bewertet": {"type": "boolean"}, "leitplanke_c_bezug": {"type": "boolean"}, "vulnerabilitaets_zuerst_status": {"enum": ["pass", "offen", "fail"]}}}
+  }
+}
