@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thefreshmind4o.github.io/ethikeskin/schemas/ethikeskin-v1.4-policy-decision.schema.json",
+  "title": "EthikeSkin v1.4 – Policy Decision",
+  "description": "Maschinenlesbare PDP-Antwort. Unbestimmt, nicht zutreffend, aufgehobene Schutzwirkung und unerfüllbare Auflagen werden fail-closed als verweigert vollzogen.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "entscheidungs_id",
+    "zeitpunkt",
+    "anfrage_ref",
+    "entscheidung",
+    "wirksame_entscheidung",
+    "regel",
+    "begruendung",
+    "kapazitaet",
+    "kapazitaetsableitung",
+    "auflagen",
+    "fail_closed",
+    "gueltigkeit"
+  ],
+  "unevaluatedProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.4.0"
+    },
+    "entscheidungs_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "zeitpunkt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "anfrage_ref": {
+      "type": "object",
+      "required": ["query_event_id", "eingangs_hash"],
+      "additionalProperties": false,
+      "properties": {
+        "query_event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eingangs_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "entscheidung": {
+      "enum": ["erlaubt", "verweigert", "unbestimmt", "nicht_zutreffend"]
+    },
+    "wirksame_entscheidung": {
+      "enum": ["erlaubt", "verweigert"]
+    },
+    "regel": {
+      "type": "object",
+      "required": ["regel_id", "regel_version"],
+      "additionalProperties": false,
+      "properties": {
+        "regel_id": {
+          "type": "string",
+          "pattern": "^ESK-[0-9]{3}-[a-z0-9-]+$"
+        },
+        "regel_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    },
+    "begruendung": {
+      "type": "object",
+      "required": ["code", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 3
+        },
+        "text": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 1000
+        }
+      }
+    },
+    "kapazitaet": {
+      "$ref": "ethikeskin-v1.4.1-kapazitaet.schema.json"
+    },
+    "kapazitaetsableitung": {
+      "type": "object",
+      "required": ["schutzwirkung", "auflagen_erzwungen", "gruende"],
+      "additionalProperties": false,
+      "properties": {
+        "schutzwirkung": {
+          "enum": ["wirksam", "eingeschraenkt", "aufgehoben"]
+        },
+        "auflagen_erzwungen": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "pattern": "^AUF-1[0-9]{2}$"
+          }
+        },
+        "gruende": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "auflagen": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["auflage_id", "beschreibung", "blockierend"],
+        "additionalProperties": false,
+        "properties": {
+          "auflage_id": {
+            "pattern": "^AUF-1[0-9]{2}$"
+          },
+          "beschreibung": {
+            "type": "string",
+            "minLength": 10
+          },
+          "blockierend": {
+            "const": true
+          }
+        }
+      }
+    },
+    "fail_closed": {
+      "type": "object",
+      "required": ["ausgeloest", "ursache", "standardentscheidung"],
+      "additionalProperties": false,
+      "properties": {
+        "ausgeloest": {
+          "type": "boolean"
+        },
+        "ursache": {
+          "enum": [
+            "keine",
+            "entscheidung_unbestimmt",
+            "keine_regel_zutreffend",
+            "schutzwirkung_aufgehoben",
+            "auflage_nicht_erfuellbar"
+          ]
+        },
+        "standardentscheidung": {
+          "const": "verweigert"
+        }
+      }
+    },
+    "gueltigkeit": {
+      "type": "object",
+      "required": ["ttl_sekunden", "gueltig_bis", "nach_ablauf"],
+      "additionalProperties": false,
+      "properties": {
+        "ttl_sekunden": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "gueltig_bis": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nach_ablauf": {
+          "const": "verweigert"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "entscheidung": {
+            "enum": ["unbestimmt", "nicht_zutreffend"]
+          }
+        },
+        "required": ["entscheidung"]
+      },
+      "then": {
+        "properties": {
+          "wirksame_entscheidung": {
+            "const": "verweigert"
+          },
+          "fail_closed": {
+            "properties": {
+              "ausgeloest": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "entscheidung": {
+            "const": "verweigert"
+          }
+        },
+        "required": ["entscheidung"]
+      },
+      "then": {
+        "properties": {
+          "wirksame_entscheidung": {
+            "const": "verweigert"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kapazitaetsableitung": {
+            "properties": {
+              "schutzwirkung": {
+                "const": "aufgehoben"
+              }
+            },
+            "required": ["schutzwirkung"]
+          }
+        },
+        "required": ["kapazitaetsableitung"]
+      },
+      "then": {
+        "properties": {
+          "wirksame_entscheidung": {
+            "const": "verweigert"
+          },
+          "fail_closed": {
+            "properties": {
+              "ausgeloest": {
+                "const": true
+              },
+              "ursache": {
+                "const": "schutzwirkung_aufgehoben"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
