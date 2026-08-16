@@ -1,175 +1,156 @@
 'use strict';
 
 const { createHash } = require('node:crypto');
-const fs = require('node:fs');
-const path = require('node:path');
+const dateisystem = require('node:fs');
+const pfade = require('node:path');
 const Ajv2020 = require('ajv/dist/2020');
-const queryEventModule = require('./ethikeskin-v13-query-event');
-const { buildPolicyDecision, enforceObligations } = require('./ethikeskin-policy-decision');
+const anfrageModul = require('./ethikeskin-v13-query-event');
+const { baueEntscheidung, pruefeAuflagen } = require('./ethikeskin-policy-decision');
 
-function canonicalize(value) {
-  if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalize(value[key])}`).join(',')}}`;
+function kanonisiere(wert) {
+  if (Array.isArray(wert)) return `[${wert.map(kanonisiere).join(',')}]`;
+  if (wert && typeof wert === 'object') {
+    return `{${Object.keys(wert).sort().map((schluessel) => `${JSON.stringify(schluessel)}:${kanonisiere(wert[schluessel])}`).join(',')}}`;
   }
-  return JSON.stringify(value);
+  return JSON.stringify(wert);
 }
 
-function hashEvent(event) {
-  return createHash('sha256').update(canonicalize(event), 'utf8').digest('hex');
+function hasheEreignis(ereignis) {
+  return createHash('sha256').update(kanonisiere(ereignis), 'utf8').digest('hex');
 }
 
-function resolveQueryValidator(moduleValue = queryEventModule) {
-  const candidates = [
-    moduleValue && moduleValue.validateQueryEvent,
-    moduleValue && moduleValue.validate,
-    moduleValue && moduleValue.validator,
-    typeof moduleValue === 'function' ? moduleValue : null
+function ermittleAnfrageValidierer(modul = anfrageModul) {
+  const kandidaten = [
+    modul && modul.pruefeAnfrage,
+    modul && modul.validateQueryEvent,
+    modul && modul.validate,
+    modul && modul.validator,
+    typeof modul === 'function' ? modul : null
   ];
-  const validator = candidates.find((candidate) => typeof candidate === 'function');
-  if (!validator) {
-    throw new TypeError('ethikeskin-v13-query-event exportiert keinen erkennbaren Validator');
+  const validierer = kandidaten.find((kandidat) => typeof kandidat === 'function');
+  if (!validierer) {
+    throw new TypeError('ethikeskin-v13-query-event exportiert keinen erkennbaren Validierer');
   }
-  return validator;
+  return validierer;
 }
 
-function normalizeValidation(result, validator) {
-  if (typeof result === 'boolean') {
-    return { valid: result, errors: result ? [] : (validator.errors || []) };
+function normalisiereBefund(befund, validierer) {
+  if (typeof befund === 'boolean') {
+    return { gueltig: befund, fehler: befund ? [] : (validierer.errors || []) };
   }
-  if (result && typeof result === 'object' && typeof result.valid === 'boolean') {
-    return { valid: result.valid, errors: result.errors || [] };
+  if (befund && typeof befund === 'object' && typeof befund.valid === 'boolean') {
+    return { gueltig: befund.valid, fehler: befund.errors || [] };
   }
-  throw new TypeError('Query-Validator muss Boolean oder { valid, errors } liefern');
+  if (befund && typeof befund === 'object' && typeof befund.gueltig === 'boolean') {
+    return { gueltig: befund.gueltig, fehler: befund.fehler || [] };
+  }
+  throw new TypeError('Anfrage-Validierer muss Wahrheitswert oder Befundobjekt liefern');
 }
 
-function createPolicySchemaValidator() {
-  const schemasDir = path.resolve(__dirname, '../../schemas');
-  const capacitySchema = JSON.parse(fs.readFileSync(
-    path.join(schemasDir, 'ethikeskin-v1.4.1-kapazitaet.schema.json'), 'utf8'
+function erstelleEntscheidungsValidierer() {
+  const schemaOrdner = pfade.resolve(__dirname, '../../schemas');
+  const kapazitaetsSchema = JSON.parse(dateisystem.readFileSync(
+    pfade.join(schemaOrdner, 'ethikeskin-v1.4.1-kapazitaet.schema.json'), 'utf8'
   ));
-  const policySchema = JSON.parse(fs.readFileSync(
-    path.join(schemasDir, 'ethikeskin-v1.4-policy-decision.schema.json'), 'utf8'
+  const entscheidungsSchema = JSON.parse(dateisystem.readFileSync(
+    pfade.join(schemaOrdner, 'ethikeskin-v1.4-policy-decision.schema.json'), 'utf8'
   ));
 
   const ajv = new Ajv2020({ allErrors: true, strict: false });
   ajv.addFormat('uuid', /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-  ajv.addFormat('date-time', (value) => typeof value === 'string' && !Number.isNaN(Date.parse(value)));
-  ajv.addSchema(capacitySchema);
-  return ajv.compile(policySchema);
+  ajv.addFormat('date-time', (wert) => typeof wert === 'string' && !Number.isNaN(Date.parse(wert)));
+  ajv.addSchema(kapazitaetsSchema);
+  return ajv.compile(entscheidungsSchema);
 }
 
-function extractQueryEventId(queryEvent) {
-  const id = queryEvent && (
-    queryEvent.query_event_id ||
-    queryEvent.event_id ||
-    queryEvent.id
+function ermittleAnfrageKennung(anfrageEreignis) {
+  const kennung = anfrageEreignis && (
+    anfrageEreignis.query_event_id ||
+    anfrageEreignis.event_id ||
+    anfrageEreignis.id
   );
-  return typeof id === 'string' && id.length > 0 ? id : null;
+  return typeof kennung === 'string' && kennung.length > 0 ? kennung : null;
 }
 
-function createPolicyPipeline(options = {}) {
-  const queryValidator = options.validateQueryEvent || resolveQueryValidator();
-  const evaluate = options.evaluate;
-  if (typeof evaluate !== 'function') {
-    throw new TypeError('createPolicyPipeline erfordert evaluate(queryEvent, context)');
+function verweigere(ursache, phase, zusatz = {}) {
+  return Object.freeze({
+    freigegeben: false,
+    wirksame_entscheidung: 'verweigert',
+    phase,
+    ursache,
+    ...zusatz
+  });
+}
+
+function erstelleEntscheidungsstrecke(optionen = {}) {
+  const pruefeAnfrage = optionen.pruefeAnfrage || ermittleAnfrageValidierer();
+  const werteAus = optionen.werteAus;
+  if (typeof werteAus !== 'function') {
+    throw new TypeError('erstelleEntscheidungsstrecke erfordert werteAus(anfrageEreignis, kontext)');
   }
-  const validatePolicy = options.validatePolicyDecision || createPolicySchemaValidator();
+  const pruefeEntscheidung = optionen.pruefeEntscheidung || erstelleEntscheidungsValidierer();
 
-  return function runPolicyPipeline(queryEvent, context = {}) {
-    let queryValidation;
+  return function fuehreStreckeAus(anfrageEreignis, kontext = {}) {
+    let befund;
     try {
-      queryValidation = normalizeValidation(queryValidator(queryEvent), queryValidator);
-    } catch (error) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'query_validation',
-        ursache: 'query_validator_fehler',
-        errors: Object.freeze([error.message])
+      befund = normalisiereBefund(pruefeAnfrage(anfrageEreignis), pruefeAnfrage);
+    } catch (fehler) {
+      return verweigere('anfrage_validierer_fehler', 'anfrage_pruefung', { fehler: Object.freeze([fehler.message]) });
+    }
+
+    if (!befund.gueltig) {
+      return verweigere('anfrage_ungueltig', 'anfrage_pruefung', { fehler: Object.freeze(befund.fehler) });
+    }
+
+    const anfrageKennung = ermittleAnfrageKennung(anfrageEreignis);
+    if (!anfrageKennung) {
+      return verweigere('anfrage_kennung_fehlt', 'anfrage_pruefung', {
+        fehler: Object.freeze(['Kein query_event_id, event_id oder id vorhanden'])
       });
     }
 
-    if (!queryValidation.valid) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'query_validation',
-        ursache: 'query_event_ungueltig',
-        errors: Object.freeze(queryValidation.errors)
-      });
-    }
-
-    const queryEventId = extractQueryEventId(queryEvent);
-    if (!queryEventId) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'query_validation',
-        ursache: 'query_event_id_fehlt',
-        errors: Object.freeze(['Kein query_event_id, event_id oder id vorhanden'])
-      });
-    }
-
-    let evaluation;
+    let auswertung;
     try {
-      evaluation = evaluate(Object.freeze({ ...queryEvent }), Object.freeze({ ...context }));
-    } catch (error) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'policy_evaluation',
-        ursache: 'evaluator_fehler',
-        errors: Object.freeze([error.message])
-      });
+      auswertung = werteAus(Object.freeze({ ...anfrageEreignis }), Object.freeze({ ...kontext }));
+    } catch (fehler) {
+      return verweigere('regelwerk_fehler', 'regelauswertung', { fehler: Object.freeze([fehler.message]) });
     }
 
-    let decision;
+    let entscheidung;
     try {
-      decision = buildPolicyDecision({
-        ...evaluation,
-        query_event_id: queryEventId,
-        eingangs_hash: hashEvent(queryEvent)
+      entscheidung = baueEntscheidung({
+        ...auswertung,
+        query_event_id: anfrageKennung,
+        eingangs_hash: hasheEreignis(anfrageEreignis)
       });
-    } catch (error) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'decision_build',
-        ursache: 'decision_build_fehler',
-        errors: Object.freeze([error.message])
+    } catch (fehler) {
+      return verweigere('entscheidungsaufbau_fehler', 'entscheidungsaufbau', { fehler: Object.freeze([fehler.message]) });
+    }
+
+    if (!pruefeEntscheidung(entscheidung)) {
+      return verweigere('entscheidung_schemawidrig', 'entscheidungspruefung', {
+        fehler: Object.freeze(pruefeEntscheidung.errors || [])
       });
     }
 
-    const validPolicy = validatePolicy(decision);
-    if (!validPolicy) {
-      return Object.freeze({
-        accepted: false,
-        wirksame_entscheidung: 'verweigert',
-        phase: 'policy_validation',
-        ursache: 'policy_decision_ungueltig',
-        errors: Object.freeze(validatePolicy.errors || [])
-      });
-    }
-
-    const fulfilled = Array.isArray(context.erfuellte_auflagen) ? context.erfuellte_auflagen : [];
-    const enforcement = enforceObligations(decision, fulfilled);
+    const erfuellt = Array.isArray(kontext.erfuellte_auflagen) ? kontext.erfuellte_auflagen : [];
+    const vollzug = pruefeAuflagen(entscheidung, erfuellt);
 
     return Object.freeze({
-      accepted: enforcement.wirksame_entscheidung === 'erlaubt',
-      wirksame_entscheidung: enforcement.wirksame_entscheidung,
-      phase: 'enforcement',
-      ursache: enforcement.fail_closed.ursache,
-      policy_decision: decision,
-      enforcement
+      freigegeben: vollzug.wirksame_entscheidung === 'erlaubt',
+      wirksame_entscheidung: vollzug.wirksame_entscheidung,
+      phase: 'vollzug',
+      ursache: vollzug.fail_closed.ursache,
+      entscheidung,
+      vollzug
     });
   };
 }
 
 module.exports = Object.freeze({
-  canonicalize,
-  hashEvent,
-  resolveQueryValidator,
-  createPolicySchemaValidator,
-  createPolicyPipeline
+  kanonisiere,
+  hasheEreignis,
+  ermittleAnfrageValidierer,
+  erstelleEntscheidungsValidierer,
+  erstelleEntscheidungsstrecke
 });

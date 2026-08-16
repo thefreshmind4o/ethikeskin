@@ -1,30 +1,30 @@
 'use strict';
 
-const assert = require('node:assert/strict');
-const { deriveCapacity, enforceEffectiveDecision } = require('./ethikeskin-capacity-policy');
+const pruefung = require('node:assert/strict');
+const { leiteKapazitaetAb, erzwingeWirksameEntscheidung } = require('./ethikeskin-capacity-policy');
 
-function base(overrides = {}) {
+function grundfall(abweichungen = {}) {
   return {
     schadensschwere: 'I',
     reversibilitaet: 'reversibel',
     expositionsregime: 'tropfen',
     containment: 'ausschliessend',
     trageform: 'integriert',
-    ...overrides
+    ...abweichungen
   };
 }
 
-const hood = deriveCapacity(base());
-assert.equal(hood.schutzwirkung, 'wirksam');
-assert.deepEqual(hood.auflagen_erzwungen, []);
+const kapuze = leiteKapazitaetAb(grundfall());
+pruefung.equal(kapuze.schutzwirkung, 'wirksam');
+pruefung.deepEqual(kapuze.auflagen_erzwungen, []);
 
-const umbrella = deriveCapacity(base({
+const schirm = leiteKapazitaetAb(grundfall({
   trageform: 'handgehalten_teilbar',
   schirm: { weglegbar_jederzeit: true, versagt_bei: ['seitenlast'] }
 }));
-assert.deepEqual(umbrella.auflagen_erzwungen, ['AUF-105']);
+pruefung.deepEqual(schirm.auflagen_erzwungen, ['AUF-105']);
 
-const immersion = deriveCapacity(base({
+const immersion = leiteKapazitaetAb(grundfall({
   schadensschwere: 'III',
   reversibilitaet: 'irreversibel',
   expositionsregime: 'immersion',
@@ -33,34 +33,34 @@ const immersion = deriveCapacity(base({
   dauer: { zeitbudget_min: 50, budget_erschoepft: false },
   durchsatz: { limit_pro_stunde: 3, gemessen: 2, ausgetauscht: false },
   ausstieg: { protokoll_erforderlich: true, stufen: [{ stufe: 'abschluss', dauer_min: 3 }] },
-  versorgung: { partner_pflicht: true, partner_ref: 'buddy-1' }
+  versorgung: { partner_pflicht: true, partner_ref: 'begleitung-1' }
 }));
-assert.equal(immersion.schutzwirkung, 'wirksam');
-assert.deepEqual(immersion.auflagen_erzwungen, ['AUF-101', 'AUF-102', 'AUF-103', 'AUF-104', 'AUF-106']);
+pruefung.equal(immersion.schutzwirkung, 'wirksam');
+pruefung.deepEqual(immersion.auflagen_erzwungen, ['AUF-101', 'AUF-102', 'AUF-103', 'AUF-104', 'AUF-106']);
 
-const exchanged = deriveCapacity(base({
+const ausgetauscht = leiteKapazitaetAb(grundfall({
   containment: 'einlassend_temperierend',
   durchsatz: { limit_pro_stunde: 3, gemessen: 4, ausgetauscht: true }
 }));
-assert.equal(exchanged.schutzwirkung, 'aufgehoben');
-assert.ok(exchanged.gruende.includes('durchsatz_ueberschritten_oder_ausgetauscht'));
+pruefung.equal(ausgetauscht.schutzwirkung, 'aufgehoben');
+pruefung.ok(ausgetauscht.gruende.includes('durchsatz_ueberschritten_oder_ausgetauscht'));
 
-const denied = enforceEffectiveDecision(
+const verweigert = erzwingeWirksameEntscheidung(
   { entscheidung: 'erlaubt', wirksame_entscheidung: 'erlaubt' },
-  exchanged
+  ausgetauscht
 );
-assert.equal(denied.wirksame_entscheidung, 'verweigert');
-assert.equal(denied.fail_closed.ursache, 'schutzwirkung_aufgehoben');
+pruefung.equal(verweigert.wirksame_entscheidung, 'verweigert');
+pruefung.equal(verweigert.fail_closed.ursache, 'schutzwirkung_aufgehoben');
 
-assert.throws(() => deriveCapacity(base({
+pruefung.throws(() => leiteKapazitaetAb(grundfall({
   expositionsregime: 'immersion',
   trageform: 'handgehalten_teilbar'
 })), /unvereinbar/);
 
-assert.throws(() => deriveCapacity(base({
+pruefung.throws(() => leiteKapazitaetAb(grundfall({
   schadensschwere: 'III',
   reversibilitaet: 'reversibel',
   versorgung: { partner_pflicht: true }
 })), /nicht als reversibel/);
 
-console.log('EthikeSkin capacity policy: 7 tests passed');
+console.log('EthikeSkin Kapazitaetsregelwerk: 7 Pruefungen bestanden');

@@ -1,15 +1,15 @@
 'use strict';
 
-const OBLIGATIONS = Object.freeze({
-  TIME_BUDGET: 'AUF-101',
-  STAGED_EXIT: 'AUF-102',
+const AUFLAGEN = Object.freeze({
+  ZEITBUDGET: 'AUF-101',
+  AUSSTIEG: 'AUF-102',
   PARTNER: 'AUF-103',
-  THROUGHPUT: 'AUF-104',
-  REMOVABLE: 'AUF-105',
-  SUPERVISION: 'AUF-106'
+  DURCHSATZ: 'AUF-104',
+  ABLEGBARKEIT: 'AUF-105',
+  VERSORGUNG: 'AUF-106'
 });
 
-const ENUMS = Object.freeze({
+const WERTEBEREICHE = Object.freeze({
   schadensschwere: ['I', 'II', 'III'],
   reversibilitaet: ['reversibel', 'teilreversibel', 'irreversibel'],
   expositionsregime: ['tropfen', 'spritzer', 'immersion'],
@@ -17,51 +17,51 @@ const ENUMS = Object.freeze({
   trageform: ['integriert', 'koerpergebunden', 'handgehalten_teilbar', 'umgebungsgebunden']
 });
 
-function requireObject(value, field) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new TypeError(`${field} muss ein Objekt sein`);
+function verlangeObjekt(wert, feld) {
+  if (!wert || typeof wert !== 'object' || Array.isArray(wert)) {
+    throw new TypeError(`${feld} muss ein Objekt sein`);
   }
-  return value;
+  return wert;
 }
 
-function requireEnum(input, field) {
-  if (!ENUMS[field].includes(input[field])) {
-    throw new TypeError(`${field} ist ungueltig oder fehlt`);
+function verlangeWert(eingabe, feld) {
+  if (!WERTEBEREICHE[feld].includes(eingabe[feld])) {
+    throw new TypeError(`${feld} ist ungueltig oder fehlt`);
   }
 }
 
-function deriveCapacity(input) {
-  requireObject(input, 'kapazitaet');
-  Object.keys(ENUMS).forEach((field) => requireEnum(input, field));
+function leiteKapazitaetAb(eingabe) {
+  verlangeObjekt(eingabe, 'kapazitaet');
+  Object.keys(WERTEBEREICHE).forEach((feld) => verlangeWert(eingabe, feld));
 
-  const obligations = new Set();
-  const reasons = [];
-  let protection = 'wirksam';
+  const auflagen = new Set();
+  const gruende = [];
+  let schutzwirkung = 'wirksam';
 
-  if (input.schadensschwere === 'III') {
-    if (input.reversibilitaet === 'reversibel') {
+  if (eingabe.schadensschwere === 'III') {
+    if (eingabe.reversibilitaet === 'reversibel') {
       throw new Error('Schadensschwere III darf nicht als reversibel deklariert werden');
     }
-    requireObject(input.versorgung, 'versorgung');
-    obligations.add(OBLIGATIONS.SUPERVISION);
+    verlangeObjekt(eingabe.versorgung, 'versorgung');
+    auflagen.add(AUFLAGEN.VERSORGUNG);
   }
 
-  if (input.expositionsregime === 'spritzer') {
-    if (!['E1', 'E2', 'E3'].includes(input.lastklasse)) {
+  if (eingabe.expositionsregime === 'spritzer') {
+    if (!['E1', 'E2', 'E3'].includes(eingabe.lastklasse)) {
       throw new Error('Spritzer-Regime erfordert lastklasse E1, E2 oder E3');
     }
-    if (typeof input.ueberschritten !== 'boolean') {
-      throw new Error('Spritzer-Regime erfordert ueberschritten als Boolean');
+    if (typeof eingabe.ueberschritten !== 'boolean') {
+      throw new Error('Spritzer-Regime erfordert ueberschritten als Wahrheitswert');
     }
   }
 
-  if (input.expositionsregime === 'immersion') {
-    if (input.trageform === 'handgehalten_teilbar') {
+  if (eingabe.expositionsregime === 'immersion') {
+    if (eingabe.trageform === 'handgehalten_teilbar') {
       throw new Error('Immersion ist mit handgehalten_teilbar unvereinbar');
     }
-    const dauer = requireObject(input.dauer, 'dauer');
-    const ausstieg = requireObject(input.ausstieg, 'ausstieg');
-    const versorgung = requireObject(input.versorgung, 'versorgung');
+    const dauer = verlangeObjekt(eingabe.dauer, 'dauer');
+    const ausstieg = verlangeObjekt(eingabe.ausstieg, 'ausstieg');
+    const versorgung = verlangeObjekt(eingabe.versorgung, 'versorgung');
     if (!Number.isInteger(dauer.zeitbudget_min) || dauer.zeitbudget_min < 1) {
       throw new Error('Immersion erfordert ein positives zeitbudget_min');
     }
@@ -71,54 +71,54 @@ function deriveCapacity(input) {
     if (versorgung.partner_pflicht !== true) {
       throw new Error('Immersion erfordert partner_pflicht');
     }
-    obligations.add(OBLIGATIONS.TIME_BUDGET);
-    obligations.add(OBLIGATIONS.STAGED_EXIT);
-    obligations.add(OBLIGATIONS.PARTNER);
+    auflagen.add(AUFLAGEN.ZEITBUDGET);
+    auflagen.add(AUFLAGEN.AUSSTIEG);
+    auflagen.add(AUFLAGEN.PARTNER);
   }
 
-  if (input.containment === 'einlassend_temperierend') {
-    const throughput = requireObject(input.durchsatz, 'durchsatz');
-    if (typeof throughput.limit_pro_stunde !== 'number' || throughput.limit_pro_stunde < 0) {
+  if (eingabe.containment === 'einlassend_temperierend') {
+    const durchsatz = verlangeObjekt(eingabe.durchsatz, 'durchsatz');
+    if (typeof durchsatz.limit_pro_stunde !== 'number' || durchsatz.limit_pro_stunde < 0) {
       throw new Error('Einlassendes Containment erfordert ein Durchsatzlimit');
     }
-    obligations.add(OBLIGATIONS.THROUGHPUT);
-    if (throughput.ausgetauscht === true || throughput.gemessen > throughput.limit_pro_stunde) {
-      protection = 'aufgehoben';
-      reasons.push('durchsatz_ueberschritten_oder_ausgetauscht');
+    auflagen.add(AUFLAGEN.DURCHSATZ);
+    if (durchsatz.ausgetauscht === true || durchsatz.gemessen > durchsatz.limit_pro_stunde) {
+      schutzwirkung = 'aufgehoben';
+      gruende.push('durchsatz_ueberschritten_oder_ausgetauscht');
     }
   }
 
-  if (input.dauer && input.dauer.budget_erschoepft === true) {
-    protection = 'aufgehoben';
-    reasons.push('zeitbudget_erschoepft');
+  if (eingabe.dauer && eingabe.dauer.budget_erschoepft === true) {
+    schutzwirkung = 'aufgehoben';
+    gruende.push('zeitbudget_erschoepft');
   }
 
-  if (input.ueberschritten === true) {
-    protection = 'aufgehoben';
-    reasons.push('lastklasse_ueberschritten');
+  if (eingabe.ueberschritten === true) {
+    schutzwirkung = 'aufgehoben';
+    gruende.push('lastklasse_ueberschritten');
   }
 
-  if (input.trageform === 'handgehalten_teilbar') {
-    const umbrella = requireObject(input.schirm, 'schirm');
-    if (umbrella.weglegbar_jederzeit !== true) {
+  if (eingabe.trageform === 'handgehalten_teilbar') {
+    const schirm = verlangeObjekt(eingabe.schirm, 'schirm');
+    if (schirm.weglegbar_jederzeit !== true) {
       throw new Error('Handgehaltener Schutz muss jederzeit weglegbar sein');
     }
-    obligations.add(OBLIGATIONS.REMOVABLE);
+    auflagen.add(AUFLAGEN.ABLEGBARKEIT);
   }
 
   return Object.freeze({
-    schutzwirkung: protection,
-    auflagen_erzwungen: Object.freeze([...obligations].sort()),
-    gruende: Object.freeze(reasons)
+    schutzwirkung,
+    auflagen_erzwungen: Object.freeze([...auflagen].sort()),
+    gruende: Object.freeze(gruende)
   });
 }
 
-function enforceEffectiveDecision(policyDecision, derivedCapacity) {
-  requireObject(policyDecision, 'policyDecision');
-  requireObject(derivedCapacity, 'derivedCapacity');
-  if (derivedCapacity.schutzwirkung === 'aufgehoben') {
+function erzwingeWirksameEntscheidung(entscheidung, kapazitaetsableitung) {
+  verlangeObjekt(entscheidung, 'entscheidung');
+  verlangeObjekt(kapazitaetsableitung, 'kapazitaetsableitung');
+  if (kapazitaetsableitung.schutzwirkung === 'aufgehoben') {
     return Object.freeze({
-      ...policyDecision,
+      ...entscheidung,
       wirksame_entscheidung: 'verweigert',
       fail_closed: Object.freeze({
         ausgeloest: true,
@@ -127,7 +127,7 @@ function enforceEffectiveDecision(policyDecision, derivedCapacity) {
       })
     });
   }
-  return Object.freeze({ ...policyDecision });
+  return Object.freeze({ ...entscheidung });
 }
 
-module.exports = Object.freeze({ OBLIGATIONS, deriveCapacity, enforceEffectiveDecision });
+module.exports = Object.freeze({ AUFLAGEN, WERTEBEREICHE, leiteKapazitaetAb, erzwingeWirksameEntscheidung });
