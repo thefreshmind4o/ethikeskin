@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thefreshmind4o.github.io/ethikeskin/schemas/ethikeskin-v1.4.1-kapazitaet.schema.json",
+  "title": "EthikeSkin v1.4.1 – Kapazität",
+  "description": "Dreiachsiges Kapazitätsmodell: Schadensschwere × Expositionsregime × Containment. Schutzwirkung und Auflagen werden vom Kapazitäts-Ableiter erzeugt und dürfen nicht vom Client frei attestiert werden.",
+  "type": "object",
+  "required": [
+    "schadensschwere",
+    "reversibilitaet",
+    "expositionsregime",
+    "containment",
+    "trageform"
+  ],
+  "unevaluatedProperties": false,
+  "properties": {
+    "schadensschwere": {
+      "enum": ["I", "II", "III"]
+    },
+    "reversibilitaet": {
+      "enum": ["reversibel", "teilreversibel", "irreversibel"]
+    },
+    "expositionsregime": {
+      "enum": ["tropfen", "spritzer", "immersion"]
+    },
+    "containment": {
+      "enum": ["ausschliessend", "dosiert", "einlassend_temperierend"]
+    },
+    "trageform": {
+      "enum": ["integriert", "koerpergebunden", "handgehalten_teilbar", "umgebungsgebunden"]
+    },
+    "lastklasse": {
+      "enum": ["E1", "E2", "E3"]
+    },
+    "ueberschritten": {
+      "type": "boolean"
+    },
+    "dauer": {
+      "type": "object",
+      "required": ["zeitbudget_min"],
+      "additionalProperties": false,
+      "properties": {
+        "zeitbudget_min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "verbrauchte_zeit_min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "budget_erschoepft": {
+          "type": "boolean"
+        }
+      }
+    },
+    "durchsatz": {
+      "type": "object",
+      "required": ["limit_pro_stunde", "gemessen", "ausgetauscht"],
+      "additionalProperties": false,
+      "properties": {
+        "limit_pro_stunde": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gemessen": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ausgetauscht": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ausstieg": {
+      "type": "object",
+      "required": ["protokoll_erforderlich", "stufen"],
+      "additionalProperties": false,
+      "properties": {
+        "protokoll_erforderlich": {
+          "type": "boolean"
+        },
+        "stufen": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["stufe", "dauer_min"],
+            "additionalProperties": false,
+            "properties": {
+              "stufe": {
+                "type": "string",
+                "minLength": 1
+              },
+              "dauer_min": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "versorgung": {
+      "type": "object",
+      "required": ["partner_pflicht"],
+      "additionalProperties": false,
+      "properties": {
+        "partner_pflicht": {
+          "type": "boolean"
+        },
+        "partner_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supervision_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "schirm": {
+      "type": "object",
+      "required": ["weglegbar_jederzeit", "versagt_bei"],
+      "additionalProperties": false,
+      "properties": {
+        "weglegbar_jederzeit": {
+          "const": true
+        },
+        "versagt_bei": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["seitenlast", "dauerbelastung", "zwei_haende_noetig", "immersion"]
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schadensschwere": {
+            "const": "III"
+          }
+        },
+        "required": ["schadensschwere"]
+      },
+      "then": {
+        "required": ["versorgung"],
+        "properties": {
+          "reversibilitaet": {
+            "enum": ["teilreversibel", "irreversibel"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "expositionsregime": {
+            "const": "spritzer"
+          }
+        },
+        "required": ["expositionsregime"]
+      },
+      "then": {
+        "required": ["lastklasse", "ueberschritten"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "expositionsregime": {
+            "const": "immersion"
+          }
+        },
+        "required": ["expositionsregime"]
+      },
+      "then": {
+        "required": ["dauer", "ausstieg", "versorgung"],
+        "properties": {
+          "trageform": {
+            "not": {
+              "const": "handgehalten_teilbar"
+            }
+          },
+          "ausstieg": {
+            "properties": {
+              "protokoll_erforderlich": {
+                "const": true
+              }
+            }
+          },
+          "versorgung": {
+            "properties": {
+              "partner_pflicht": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "containment": {
+            "const": "einlassend_temperierend"
+          }
+        },
+        "required": ["containment"]
+      },
+      "then": {
+        "required": ["durchsatz"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "trageform": {
+            "const": "handgehalten_teilbar"
+          }
+        },
+        "required": ["trageform"]
+      },
+      "then": {
+        "required": ["schirm"]
+      }
+    }
+  ]
+}

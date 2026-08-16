@@ -1,0 +1,35 @@
+name: EthikeSkin Capacity Policy
+
+on:
+  push:
+    paths:
+      - 'packages/ethikeskin-ajv/ethikeskin-capacity-policy.js'
+      - 'packages/ethikeskin-ajv/test-capacity-policy.js'
+      - 'schemas/ethikeskin-v1.4.1-kapazitaet.schema.json'
+      - '.github/workflows/capacity-policy-ci.yml'
+  pull_request:
+    paths:
+      - 'packages/ethikeskin-ajv/ethikeskin-capacity-policy.js'
+      - 'packages/ethikeskin-ajv/test-capacity-policy.js'
+      - 'schemas/ethikeskin-v1.4.1-kapazitaet.schema.json'
+      - '.github/workflows/capacity-policy-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capacity-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run capacity policy regression tests
+        run: node packages/ethikeskin-ajv/test-capacity-policy.js
+      - name: Parse capacity schema
+        run: node -e "JSON.parse(require('node:fs').readFileSync('schemas/ethikeskin-v1.4.1-kapazitaet.schema.json','utf8')); console.log('capacity schema: valid JSON')"
