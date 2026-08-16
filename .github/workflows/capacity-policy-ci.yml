@@ -6,10 +6,12 @@ on:
       - 'packages/ethikeskin-ajv/ethikeskin-capacity-policy.js'
       - 'packages/ethikeskin-ajv/ethikeskin-policy-decision.js'
       - 'packages/ethikeskin-ajv/ethikeskin-policy-pipeline.js'
+      - 'packages/ethikeskin-ajv/ethikeskin-enforcement-gateway.js'
       - 'packages/ethikeskin-ajv/ethikeskin-v13-query-event.js'
       - 'packages/ethikeskin-ajv/test-capacity-policy.js'
       - 'packages/ethikeskin-ajv/test-policy-decision.js'
       - 'packages/ethikeskin-ajv/test-policy-pipeline.js'
+      - 'packages/ethikeskin-ajv/test-enforcement-gateway.js'
       - 'schemas/ethikeskin-v1.3-query-event-contract.json'
       - 'schemas/ethikeskin-v1.4.1-kapazitaet.schema.json'
       - 'schemas/ethikeskin-v1.4-policy-decision.schema.json'
@@ -50,6 +52,8 @@ jobs:
         run: node test-policy-decision.js
       - name: Run end-to-end policy pipeline tests
         run: node test-policy-pipeline.js
+      - name: Run enforcement gateway tests
+        run: node test-enforcement-gateway.js
       - name: Parse JSON schemas
         run: |
           node -e "JSON.parse(require('node:fs').readFileSync('../../schemas/ethikeskin-v1.4.1-kapazitaet.schema.json','utf8'))"
